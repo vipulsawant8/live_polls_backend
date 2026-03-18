@@ -113,7 +113,7 @@ const closePollHandler = async(io, socket, { poll }) => {
 
 	const name = socket.name;
 	const room = `poll:${poll._id}`;
-	socket.to(room).emit(POLL_EVENTS.CLOSE_POLL, { poll, name });
+	socket.broadcast.emit(POLL_EVENTS.CLOSE_POLL, { poll, name });
 };
 
 export { castVoteHandler, joinPollHandler, leavePollHandler, addPollHandler, closePollHandler };

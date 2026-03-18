@@ -22,12 +22,12 @@ const socketHandler = (io) => {
 			);
 			const expiresIn = decoded.exp * 1000 - Date.now();
 
-			setTimeout(() => {
+			const timeout = setTimeout(() => {
 				socket.disconnect(true);
 			}, expiresIn);
 
 			socket.on("disconnect", () => {
-				clearTimeout(expiresIn);
+				clearTimeout(timeout);
 			});
 
 			socket.userID = decoded.id;
