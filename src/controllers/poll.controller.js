@@ -1,4 +1,3 @@
-import asyncHandler from 'express-async-handler';
 import Poll from '../models/poll.model.js';
 
 import ApiError from '../utils/ApiError.js';
@@ -8,7 +7,7 @@ import { randomUUID } from "crypto";
 
 const POLL_EXPIRY_WINDOW = 7 * 24 * 60 * 60 * 1000;
 
-const createPoll = asyncHandler( async (req, res) => {
+const createPoll =  async (req, res) => {
 	const userID = req.user._id;
 
 	const { title, options } = req.body;
@@ -33,9 +32,9 @@ const createPoll = asyncHandler( async (req, res) => {
 
 	const response = { success: true, data: formattedPoll, message: `You created Poll "${poll.title}" successfully` };
 	return res.status(201).json(response);
-} );
+};
 
-const fetchPolls = asyncHandler( async (req, res) => {
+const fetchPolls =  async (req, res) => {
 	const userID = req.user._id;
 
 	req.log.info(
@@ -56,9 +55,9 @@ const fetchPolls = asyncHandler( async (req, res) => {
 
 	const response = { success: true, data: formattedPolls, message: "Polls fetched successfully" };
 	return res.status(200).json(response);
-} );
+};
 
-// const getPollByID = asyncHandler( async (req, res) => {
+// const getPollByID =  async (req, res) => {
 	
 // 	const pollID = req.params.id;
 
@@ -71,9 +70,9 @@ const fetchPolls = asyncHandler( async (req, res) => {
 
 // 	const response = { success: true, data: poll, message: "Poll fetched successfully" };
 // 	return res.status(200).json(response);
-// } );
+// };
 
-const closePoll = asyncHandler( async (req, res) => {
+const closePoll =  async (req, res) => {
 	const userID = req.user._id;
 	const pollID = req.params.id;
 
@@ -114,6 +113,6 @@ const closePoll = asyncHandler( async (req, res) => {
 
 	const response = { success: true, data: formattedPoll, message: `You closed Poll ${poll.title}" successfully` };
 	return res.status(200).json(response);
-} );
+};
 
 export { createPoll, fetchPolls /*, getPollByID */, closePoll };

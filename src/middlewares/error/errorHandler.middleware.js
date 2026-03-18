@@ -93,18 +93,7 @@ const errorHandler = (err, req, res, next) => {
 	}
 
 	// -----------------------------------------
-	// 6. Custom ApiError instance
-	// -----------------------------------------
-	if (err.statusCode) {
-		return res.status(err.statusCode).json({
-			success: false,
-			message: err.message,
-			...(err.data && { data: err.data })
-		});
-	}
-
-	// -----------------------------------------
-	// 7. Zod Validation Errors 
+	// 6. Zod Validation Errors 
 	// -----------------------------------------
 	if (err instanceof ZodError) {
 		const message =
@@ -117,9 +106,20 @@ const errorHandler = (err, req, res, next) => {
 	}
 
 	// -----------------------------------------
+	// 7. Custom ApiError instance
+	// -----------------------------------------
+	if (err.statusCode) {
+		return res.status(err.statusCode).json({
+			success: false,
+			message: err.message,
+			...(err.data && { data: err.data })
+		});
+	}
+
+	// -----------------------------------------
 	// 8. Fallback: internal server error
 	// -----------------------------------------
-	return res.status(500).json({
+	return res.status(err.statusCode || 500).json({
 		success: false,
 		message: isProd ? "Internal server error" : err.message,
 	});
