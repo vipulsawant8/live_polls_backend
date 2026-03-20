@@ -92,10 +92,6 @@ app.use((req, res) => {
 	res.status(404).json({ message: "Route not found", success: false });
 });
 
-process.on("SIGTERM", () => {
-  console.log("SIGTERM received. Shutting down...");
-});
-
 app.use(errorHandler);
 
 export default app;
