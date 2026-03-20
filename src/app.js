@@ -51,9 +51,9 @@ app.use(
 );
 
 app.use((req, res, next) => {
-	req.log.debug({ origin: req.headers.origin }, "Incoming request origin");
+	req.log.info({ origin: req.headers.origin }, "Incoming request origin");
 	next();
-});
+})
 
 app.use(cors(corsOptions));
 
