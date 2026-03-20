@@ -50,10 +50,9 @@ app.use(
   })
 );
 
-app.use((req, res, next) => {
-	req.log.info({ origin: req.headers.origin }, "Incoming request origin");
-	next();
-})
+app.get("/", (req, res) => {
+  res.send("OK");
+});
 
 app.use(cors(corsOptions));
 
@@ -64,6 +63,11 @@ app.use(static_("public"));
 app.use(cookieParser());
 
 app.use(httpLogger);
+
+app.use((req, res, next) => {
+	req.log.info({ origin: req.headers.origin }, "Incoming request origin");
+	next();
+});
 
 app.use(`/api-docs`, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -87,6 +91,11 @@ app.use((req, res) => {
 	);
 	res.status(404).json({ message: "Route not found", success: false });
 });
+
+process.on("SIGTERM", () => {
+  console.log("SIGTERM received. Shutting down...");
+});
+
 app.use(errorHandler);
 
 export default app;
