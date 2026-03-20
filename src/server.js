@@ -9,14 +9,17 @@ import logger from './utils/logger.js';
 
 import socketHandler from './socket/service.js';
 
+let server;
+let io;
+
 const initiateServer = async () => {
 	
 	try {
     	logger.info("Server initialization started");
 		
-		const server = http.createServer(app);
+		server = http.createServer(app);
 		const allowedOrigins = process.env.CORS_ORIGIN.split(",");
-		const io = new Server(server, {
+		io = new Server(server, {
 			cors:{
 				origin: (origin, callback) => {
 					if (!origin || allowedOrigins.includes(origin)) {
@@ -35,10 +38,10 @@ const initiateServer = async () => {
     	logger.info("Database connected successfully");
 
 		const PORT = process.env.PORT || 4000;
-		server.listen(PORT, () => {
-
-			logger.info({ port: PORT }, "Server running successfully");
-		});
+		// server.listen(PORT, () => {
+		await new Promise((resolve) => server.listen(PORT, resolve));
+		logger.info({ port: PORT }, "Server running successfully");
+		// });
 	} catch (error) {
 		
 		logger.fatal({ err: error }, "Server failed to start");
@@ -47,3 +50,35 @@ const initiateServer = async () => {
 };
 
 initiateServer();
+const shutdown = async (signal) => {
+	logger.warn(`${signal} received. Shutting down gracefully...`);
+
+	try {
+		// Stop accepting new connections
+		server.close(() => {
+			logger.info("HTTP server closed");
+		});
+
+		// Close socket.io
+		if (io) {
+			io.close(() => {
+				logger.info("Socket.IO closed");
+			});
+		}
+
+		// Close DB
+		const mongoose = await import("mongoose");
+		await mongoose.default.connection.close();
+		logger.info("MongoDB connection closed");
+
+		process.exit(0);
+
+	} catch (err) {
+		logger.error({ err }, "Error during shutdown");
+		process.exit(1);
+	}
+};
+
+// Handle signals
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
