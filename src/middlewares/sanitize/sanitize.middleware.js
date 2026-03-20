@@ -15,7 +15,7 @@ const sanitizeBody = (req, res, next) => {
 	if (req.query) sanitizeObject(req.query);
 	if (req.params) sanitizeObject(req.params);
 
-	req.log.info("sanitizeBody called");
+	req.log.debug("sanitizeBody called");
 
 	next();
 };
