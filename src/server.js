@@ -50,23 +50,29 @@ const initiateServer = async () => {
 };
 
 initiateServer();
+
+let isShuttingDown = false;
+
 const shutdown = async (signal) => {
+	
+	if (isShuttingDown) return;
+	isShuttingDown = true;
+	
 	logger.warn(`${signal} received. Shutting down gracefully...`);
 
 	try {
-		// Stop accepting new connections
-		server.close(() => {
-			logger.info("HTTP server closed");
-		});
-
-		// Close socket.io
 		if (io) {
-			io.close(() => {
-				logger.info("Socket.IO closed");
-			});
+			await new Promise((resolve) => io.close(resolve));
+			logger.info("Socket.IO closed");
 		}
 
-		// Close DB
+		if (server) {
+			await new Promise((resolve, reject) => {
+				server.close((err) => err ? reject(err) : resolve());
+			});
+			logger.info("HTTP server closed");
+		}
+
 		const mongoose = await import("mongoose");
 		await mongoose.default.connection.close();
 		logger.info("MongoDB connection closed");
